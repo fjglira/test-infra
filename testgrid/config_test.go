@@ -39,16 +39,17 @@ var dashboardPrefixes = []string{
 }
 
 var (
-	defaultInputs  options.MultiString = []string{"."}
-	prowPath                           = flag.String("prow-config", "../prow/gcp/config.yaml", "Path to prow config")
-	jobPath                            = flag.String("job-config", "../prow/gcp/cluster/jobs", "Path to prow job config")
-	awsJobPath                         = flag.String("aws-job-config", "../prow/aws/cluster/jobs/istio-ecosystem", "Path to AWS prow job config for istio-ecosystem")
-	defaultYAML                        = flag.String("default", "./default.yaml", "Default yaml for testgrid")
-	inputs         options.MultiString
-	protoPath      = flag.String("config", "", "Path to TestGrid config proto")
+	defaultInputs options.MultiString = []string{"."}
+	prowPath                          = flag.String("prow-config", "../prow/gcp/config.yaml", "Path to prow config")
+	jobPath                           = flag.String("job-config", "../prow/gcp/cluster/jobs", "Path to prow job config")
+	awsJobPath                        = flag.String("aws-job-config", "../prow/aws/cluster/jobs/istio-ecosystem",
+		"Path to AWS prow job config for istio-ecosystem")
+	defaultYAML = flag.String("default", "./default.yaml", "Default yaml for testgrid")
+	inputs      options.MultiString
+	protoPath   = flag.String("config", "", "Path to TestGrid config proto")
 )
 
-// mergedJobDir creates a temporary directory containing symlinks to all YAML
+// mergedJobDir creates a temporary directory containing copies of all YAML
 // job files from the given source directories, so prow can load them as a
 // single job config path. Callers must remove the returned directory when done.
 func mergedJobDir(sources ...string) (string, error) {
@@ -64,11 +65,11 @@ func mergedJobDir(sources ...string) (string, error) {
 			if ext := filepath.Ext(p); ext != ".yaml" && ext != ".yml" {
 				return nil
 			}
-			abs, err := filepath.Abs(p)
+			data, err := os.ReadFile(p)
 			if err != nil {
 				return err
 			}
-			return os.Symlink(abs, filepath.Join(tmpDir, info.Name()))
+			return os.WriteFile(filepath.Join(tmpDir, info.Name()), data, 0o644)
 		})
 		if err != nil {
 			os.RemoveAll(tmpDir)
