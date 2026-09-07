@@ -354,7 +354,6 @@ presubmits:
       testgrid-dashboards: istio-ecosystem_release-1.31_sail-operator
     branches:
     - ^release-1.31$
-    cluster: prow-arm
     decorate: true
     name: integ-tests-arm64_sail-operator_release-1.31
     rerun_command: /test integ-tests-arm64
@@ -556,7 +555,6 @@ presubmits:
       testgrid-dashboards: istio-ecosystem_release-1.31_sail-operator
     branches:
     - ^release-1.31$
-    cluster: prow-arm
     decorate: true
     name: unit-tests-arm64_sail-operator_release-1.31
     rerun_command: /test unit-tests-arm64
